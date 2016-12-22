@@ -6,6 +6,7 @@ const int motorLeftDirection2 = 8;
 const int motorRightSpeed = 3;
 const int motorRightDirection1 = 4;
 const int motorRightDirection2 = 5;
+#define READ_TIME_PERIOD 0.0001
 
 
 long accelX, accelY, accelZ;
@@ -110,17 +111,18 @@ void getAngle()
   angleAccelZX = atan2(gForceX, gForceZ);
   totalAccelAngle = angleAccelXY + angleAccelYZ + angleAccelZX;
 
-  angleGyroXY = atan2(gyroY, gyroX);
-  angleGyroYZ = atan2(gyroZ, gyroY);
-  angleGyroZX = atan2(gyroX, gyroZ);
-  totalGyroAngle = angleGyroXY + angleGyroYZ + angleGyroZX;
+ // angleGyroXY = atan2(gyroY, gyroX);
+ // angleGyroYZ = atan2(gyroZ, gyroY);
+  //angleGyroZX = atan2(gyroX, gyroZ);
+  //totalGyroAngle = angleGyroXY + angleGyroYZ + angleGyroZX;
 }
 
 void PID()
 {
-  currentError = 0.98*(totalAccelAngle) + 0.02*(totalGyroAngle);
+  prevError=currentError;
+  currentError = 0.02*(totalAccelAngle) + 0.98*(currentError+ angleGyroXY*READ_TIME_PERIOD);
   prop = currentError;
-  integral += prevError;
+  integral += currentError;
   der = currentError - prevError;
 
   input = Kp*(prop) + Ki*(integral) + Kd*(der);
