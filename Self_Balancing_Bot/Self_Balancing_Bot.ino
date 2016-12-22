@@ -120,7 +120,7 @@ void getAngle()
 void PID()
 {
   prevError=currentError;
-  currentError = 0.02*(totalAccelAngle) + 0.98*(currentError+ angleGyroX*READ_TIME_PERIOD);
+  currentError = 0.02*(totalAccelAngle) + 0.98*(currentError+ gyroX*READ_TIME_PERIOD);
   prop = currentError;
   integral += currentError;
   der = currentError - prevError;
