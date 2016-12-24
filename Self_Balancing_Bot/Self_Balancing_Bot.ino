@@ -1,4 +1,10 @@
 #include <Wire.h>
+#include <SoftwareSerial.h> // TX RX software library for bluetooth
+
+int bluetoothTx = 10; // bluetooth tx to 10 pin
+int bluetoothRx = 11; // bluetooth rx to 11 pin
+
+SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 
 const int motorLeftSpeed = 6;
 const int motorLeftDirection1 = 7;
@@ -24,6 +30,8 @@ double prop = 0, integral = 0, der = 0, input=0;
 void setup()
 {
   Serial.begin(9600);
+  //Setup Bluetooth serial connection to android
+  bluetooth.begin(9600);
   Wire.begin();
   setupMPU();
 }
@@ -49,9 +57,42 @@ void setupMPU()
   Wire.endTransmission();
 }
 
+void setupBluetooth(){
+//Read from bluetooth and write to usb serial
+  if(bluetooth.available()>= 2 )
+  {
+    unsigned int k = bluetooth.read();
+    unsigned int k1 = bluetooth.read();
+    unsigned int realK = (k1 *256) + k;
+
+    if (realK >= 1000 && realK <1255) 
+    {
+      int Kp = realK - 1000;
+      Serial.print("Kp = ");
+      Serial.println(Kp);
+      delay(10);
+    }
+    if (realK >= 2000 && realK <2255) 
+    {
+      int Ki = realK - 2000;
+      Serial.print("Ki = ");
+      Serial.println(Ki);
+      delay(10);
+    }
+    if (realK >= 3000 && realK <3255) 
+    {
+      int Kd = realK - 3000;
+      Serial.print("Kd = ");
+      Serial.println(Kd);
+      delay(10);
+    }
+  }
+}
+
 
 void loop()
 {
+  setupBluetooth();
   recordAccelRegister();
   recordGyroRegister();
   getAngle();
